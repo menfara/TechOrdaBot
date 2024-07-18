@@ -70,7 +70,7 @@ class LanguageSelectionScene(State):
             chat_id=chat_id,
             text=f"{Translations.language_prompt['kz']}\n"
                  f"{Translations.language_prompt['ru']}\n",
-                 # f"{Translations.language_prompt['en']}\n",
+            # f"{Translations.language_prompt['en']}\n",
             reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -275,12 +275,13 @@ class TNEStudentContractScene(State):
     async def enter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = []
 
-        keyboard.append([InlineKeyboardButton(f"{Translations.fund_school_template_button[self.language]}", callback_data=self.OPTION_1)])
+        keyboard.append([InlineKeyboardButton(f"{Translations.fund_school_template_button[self.language]}",
+                                              callback_data=self.OPTION_1)])
         keyboard.append([InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)])
         keyboard.append([InlineKeyboardButton(f"{Translations.back[self.language]}", callback_data='back')])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.callback_query.message.reply_text(Translations.student_contracts_document[self.language],
+        await update.callback_query.message.reply_text(Translations.variant_promt[self.language],
                                                        reply_markup=reply_markup, parse_mode="HTML")
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -289,7 +290,7 @@ class TNEStudentContractScene(State):
         selected_option = query.data
 
         if selected_option == self.OPTION_1:
-            with open('docs/doc1.txt', 'rb') as document:
+            with open('docs/типовой_договор_школа_студент.docx', 'rb') as document:
                 await context.bot.send_document(chat_id=query.message.chat_id, document=document)
 
         if selected_option == self.OPTION_OTHER:
@@ -326,8 +327,9 @@ class TNEFundSchoolScene(State):
         selected_option = query.data
 
         if selected_option == self.OPTION_1:
-            await update.callback_query.message.reply_text(Translations.fund_school_template[self.language],
-                                                           parse_mode="HTML")
+            with open('docs/договор_фонд_школа.docx', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document)
+
         if selected_option == self.OPTION_OTHER:
             await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language])
 
@@ -372,7 +374,7 @@ class TeachingStartedScene(State):
     options = [
         'monthly_report',
         'learning_change',
-        'special_flow'
+        'other',
     ]
 
     async def enter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -394,6 +396,9 @@ class TeachingStartedScene(State):
         query = update.callback_query
         await query.answer()
         selected_status = query.data
+
+        if selected_status == self.options[2]:
+            await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language])
 
         if selected_status == self.options[0]:
             await self.bot.transition_to(TSMonthlyReport(self.bot, self.language), update, context)
@@ -436,13 +441,15 @@ class TSMonthlyReport(State):
             question_index = int(selected_option.split('_')[1])
 
             # Get the answer for the selected question in the current language
-            answer_text = self.questions[question_index]['answer'][self.language]
+            document_path = self.questions[question_index]['answer'][self.language]
 
             # Retrieve the question text from the questions list
             question_text = self.questions[question_index]['question'][self.language]
 
+            with open(f'docs/{document_path}', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document)
+
             # Send the answer to the chat
-            await query.edit_message_text(f"{question_text}:\n\n{answer_text}")
         await self.bot.suggest_return_to_client_status(update, context)
 
 
@@ -459,7 +466,7 @@ class TSLearningChange(State):
         keyboard = []
 
         keyboard.append([InlineKeyboardButton(f"{Translations.notify_learning_change[self.language]}",
-                                              callback_data=self.OPTION_1)])
+                                              url="https://astanahub.com/account/service_request/98827/update/?tab=0")])
         keyboard.append([InlineKeyboardButton(f"{Translations.additional_agreements[self.language]}",
                                               callback_data=self.OPTION_2)])
         keyboard.append([InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)])
@@ -475,8 +482,9 @@ class TSLearningChange(State):
         selected_option = query.data
 
         if selected_option == self.OPTION_1:
-            await update.callback_query.message.reply_text(Translations.learning_change_details[self.language])
-
+            # https://astanahub.com/account/service_request/98827/update/?tab=0
+            # await update.callback_query.message.reply_text(Translations.learning_change_details[self.language])
+            pass
         if selected_option == self.OPTION_2:
             keyboard = [[InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)]]
 
@@ -521,6 +529,8 @@ class TeachingFinishedScene(State):
             await self.bot.transition_to(TFCompetenceAssessment(self.bot, self.language), update, context)
         if selected_status == self.options[1]:
             await self.bot.transition_to(TFFinalReport(self.bot, self.language), update, context)
+        if selected_status == self.options[2]:
+            await self.bot.transition_to(TFFinalPayment(self.bot, self.language), update, context)
 
 
 class TFCompetenceAssessment(State):
@@ -552,7 +562,11 @@ class TFCompetenceAssessment(State):
 
         if selected_option == self.OPTION_OTHER:
             await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language])
-
+        elif selected_option == 'question_3':
+            with open(f'docs/инструкция.docx', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document)
+            with open(f'docs/инструкция_для_школ.docx', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document)
         else:
             # Extract the question index from the callback data
             question_index = int(selected_option.split('_')[1])
@@ -564,7 +578,7 @@ class TFCompetenceAssessment(State):
             question_text = self.questions[question_index]['question'][self.language]
 
             # Send the answer to the chat
-            await query.edit_message_text(f"{question_text}:\n\n{answer_text}")
+            await query.edit_message_text(f"{question_text}:\n\n{answer_text}", parse_mode='HTML')
         await self.bot.suggest_return_to_client_status(update, context)
 
 
@@ -579,12 +593,17 @@ class TFFinalReport(State):
         self.questions = CompetenceAssessmentQuestions.questions
 
     async def enter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        keyboard = [[InlineKeyboardButton(f"{Translations.final_report_template_button[self.language]}",
-                                          callback_data=self.OPTION_1)],
-                    [InlineKeyboardButton(f"{Translations.certificate_instructions_button[self.language]}",
-                                          callback_data=self.OPTION_2)],
-                    [InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)],
-                    [InlineKeyboardButton(f"{Translations.back[self.language]}", callback_data='back')]]
+        keyboard = [
+            [InlineKeyboardButton(f"{Translations.final_report_form[self.language]}",
+                                  url="https://astanahub.com/account/service_request/98834/update/?tab=0")],
+
+            [InlineKeyboardButton(f"{Translations.final_report_template_button[self.language]}",
+                                  callback_data=self.OPTION_1)],
+
+            [InlineKeyboardButton(f"{Translations.certificate_instructions_button[self.language]}",
+                                  callback_data=self.OPTION_2)],
+            [InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)],
+            [InlineKeyboardButton(f"{Translations.back[self.language]}", callback_data='back')]]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.callback_query.message.reply_text(Translations.final_report_message[self.language],
@@ -599,16 +618,17 @@ class TFFinalReport(State):
             keyboard = [[InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.callback_query.message.reply_text(Translations.final_report_template[self.language],
-                                                           reply_markup=reply_markup)
+            with open('docs/шаблон_финального_отчета.docx', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document,
+                                                reply_markup=reply_markup)
 
         if selected_option == self.OPTION_2:
             keyboard = [[InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.callback_query.message.reply_text(
-                Translations.certificate_instructions_template[self.language],
-                reply_markup=reply_markup)
+            with open('docs/инструкция_к_шаблону_сертификата.pdf', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document,
+                                                reply_markup=reply_markup)
 
         if selected_option == self.OPTION_OTHER:
             await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language])
@@ -619,17 +639,17 @@ class TFFinalReport(State):
 class TFFinalPayment(State):
     SCENE_TAG = 'финальная_оплата'
     OPTION_OTHER = 'other'
-    OPTION_1 = 'final_report_template'
-    OPTION_2 = 'certificate_instructions'
+    OPTION_1 = 'electronic_act'
+    OPTION_2 = 'final_payment_bill'
 
     def __init__(self, bot, language=None):
         super().__init__(bot, language)
         self.questions = CompetenceAssessmentQuestions.questions
 
     async def enter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        keyboard = [[InlineKeyboardButton(f"{Translations.final_report_template_button[self.language]}",
+        keyboard = [[InlineKeyboardButton(f"{Translations.electronic_act[self.language]}",
                                           callback_data=self.OPTION_1)],
-                    [InlineKeyboardButton(f"{Translations.certificate_instructions_button[self.language]}",
+                    [InlineKeyboardButton(f"{Translations.final_payment_bill[self.language]}",
                                           callback_data=self.OPTION_2)],
                     [InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)],
                     [InlineKeyboardButton(f"{Translations.back[self.language]}", callback_data='back')]]
@@ -647,16 +667,17 @@ class TFFinalPayment(State):
             keyboard = [[InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.callback_query.message.reply_text(Translations.final_report_template[self.language],
-                                                           reply_markup=reply_markup)
+            with open('docs/памятка_по_ЭАВР_для_школы.docx', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document,
+                                                reply_markup=reply_markup)
 
         if selected_option == self.OPTION_2:
             keyboard = [[InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.callback_query.message.reply_text(
-                Translations.certificate_instructions_template[self.language],
-                reply_markup=reply_markup)
+            with open('docs/счет_на_фин_оплату_для_школы.docx', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document,
+                                                reply_markup=reply_markup)
 
         if selected_option == self.OPTION_OTHER:
             await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language])
@@ -676,7 +697,32 @@ class ContactAdminScene(State):
     ]
 
     async def enter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_language = self.language
 
+        keyboard = [
+            [InlineKeyboardButton(Translations.back[user_language], callback_data='back')],
+            [InlineKeyboardButton(Translations.confirm_contact_button[user_language], callback_data='confirm_contact_admin')],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        if update.message:
+            await update.message.reply_text(Translations.convince_message[user_language], reply_markup=reply_markup)
+        elif update.callback_query:
+            await update.callback_query.message.reply_text(Translations.convince_message[user_language], reply_markup=reply_markup)
+
+    async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        query = update.callback_query
+        await query.answer()
+        selected_option = query.data
+
+        if selected_option == 'confirm_contact_admin':
+            await self.show_options(update, context)
+        elif self.OPTIONS.__contains__(selected_option):
+            await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language],
+                                                         Translations.__dict__[selected_option]['ru'].lower().replace(
+                                                             ' ', '_'))
+
+    async def show_options(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = []
         for option in self.OPTIONS:
             button = InlineKeyboardButton(Translations.__dict__[option][self.language], callback_data=option)
@@ -689,15 +735,6 @@ class ContactAdminScene(State):
         await update.callback_query.message.reply_text(Translations.variant_promt[self.language],
                                                        reply_markup=reply_markup)
 
-    async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        query = update.callback_query
-        await query.answer()
-        selected_option = query.data
-
-        if self.OPTIONS.__contains__(selected_option):
-            await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language],
-                                                         Translations.__dict__[selected_option]['ru'].lower().replace(
-                                                             ' ', '_'))
 
 
 class Bot:
@@ -834,6 +871,8 @@ class Bot:
         keyboard = [
             [InlineKeyboardButton(Translations.return_to_client_status_button[user_language],
                                   callback_data='return_to_client_status')],
+            [InlineKeyboardButton(Translations.back[user_language],
+                                  callback_data='back')],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 

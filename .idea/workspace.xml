@@ -4,17 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c2b489f5-d049-40a1-b6ca-e1c90a752332" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/techordaBot.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/doc1.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/translations.py" afterDir="false" />
+    <list default="true" id="c2b489f5-d049-40a1-b6ca-e1c90a752332" name="Changes" comment="первый прототип TechOrdaBot">
+      <change afterPath="$PROJECT_DIR$/docs/договор_фонд_школа.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/инструкция.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/инструкция_для_школ.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/инструкция_к_шаблону_сертификата.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/инструкция_отчетности_для_школы_2024.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/памятка_по_ЭАВР_для_школы.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/счет_на_фин_оплату_для_школы.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/типовой_договор_школа_студент.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/форма_подтверждения_отчета_(для студентов).docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/шаблон_финального_отчета.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/doc1.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translations.py" beforeDir="false" afterPath="$PROJECT_DIR$/translations.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +35,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;menfara&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/menfara/TechOrdaBot&quot;,
+    &quot;accountId&quot;: &quot;7c770ea6-65b0-4196-8405-c07e2bf5736e&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -48,6 +64,11 @@
     &quot;git-widget-placeholder&quot;: &quot;master&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Farkhat\PycharmProjects\techordaBot\docs" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.main">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="techordaBot" />
@@ -115,6 +136,30 @@
       <option name="presentableId" value="Default" />
       <updated>1720780226920</updated>
     </task>
+    <task id="LOCAL-00001" summary="первый прототип TechOrdaBot">
+      <option name="closed" value="true" />
+      <created>1721198010873</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1721198010873</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="первый прототип TechOrdaBot" />
+    <option name="LAST_COMMIT_MESSAGE" value="первый прототип TechOrdaBot" />
   </component>
 </project>
