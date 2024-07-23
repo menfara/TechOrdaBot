@@ -1,8 +1,11 @@
 import configparser
+import time
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ForceReply
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler
 
+from google_sheets_reader import create_and_fill_dict_from_json, \
+    OUTPUT_FILENAME, IDS_OUTPUT_FILENAME, update_dicts
 from translations import Translations, ITSchoolsShowcaseQuestions, MonthlyReportQuestions, CompetenceAssessmentQuestions
 
 SPECIAL_CHARS = [
@@ -385,6 +388,9 @@ class TeachingStartedScene(State):
                                                   callback_data=option)])
 
         keyboard.append(
+            [InlineKeyboardButton(Translations.nps[self.language], callback_data='nps')])
+
+        keyboard.append(
             [InlineKeyboardButton(Translations.back[self.language], callback_data='back')])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -396,6 +402,9 @@ class TeachingStartedScene(State):
         query = update.callback_query
         await query.answer()
         selected_status = query.data
+
+        if selected_status == 'nps':
+            await update.callback_query.message.reply_text(Translations.nps_message[self.language])
 
         if selected_status == self.options[2]:
             await self.bot.send_message_with_force_reply(update, Translations.other_option_message[self.language])
@@ -696,24 +705,41 @@ class ContactAdminScene(State):
         'other'
     ]
 
+    STATUS_NOT_STARTED = 'status_not_started'
+    STATUS_TEACHING = 'status_teaching'
+    STATUS_FINISHED = 'status_finished'
+
     async def enter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_language = self.language
 
         keyboard = [
-            [InlineKeyboardButton(Translations.back[user_language], callback_data='back')],
-            [InlineKeyboardButton(Translations.confirm_contact_button[user_language], callback_data='confirm_contact_admin')],
+            [InlineKeyboardButton(Translations.status_not_started[self.language],
+                                  callback_data=self.STATUS_NOT_STARTED), ],
+            [InlineKeyboardButton(Translations.status_teaching[self.language], callback_data=self.STATUS_TEACHING), ],
+            [InlineKeyboardButton(Translations.status_finished[self.language], callback_data=self.STATUS_FINISHED)],
+            # [InlineKeyboardButton(Translations.back[user_language], callback_data='back')],
+            [InlineKeyboardButton(Translations.confirm_contact_button[user_language],
+                                  callback_data='confirm_contact_admin')],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         if update.message:
             await update.message.reply_text(Translations.convince_message[user_language], reply_markup=reply_markup)
         elif update.callback_query:
-            await update.callback_query.message.reply_text(Translations.convince_message[user_language], reply_markup=reply_markup)
+            await update.callback_query.message.reply_text(Translations.convince_message[user_language],
+                                                           reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         await query.answer()
         selected_option = query.data
+
+        if selected_option == self.STATUS_NOT_STARTED:
+            await self.bot.transition_to(TeachingNotStartedScene(self.bot, self.language), update, context)
+        if selected_option == self.STATUS_TEACHING:
+            await self.bot.transition_to(TeachingStartedScene(self.bot, self.language), update, context)
+        if selected_option == self.STATUS_FINISHED:
+            await self.bot.transition_to(TeachingFinishedScene(self.bot, self.language), update, context)
 
         if selected_option == 'confirm_contact_admin':
             await self.show_options(update, context)
@@ -736,12 +762,15 @@ class ContactAdminScene(State):
                                                        reply_markup=reply_markup)
 
 
-
 class Bot:
     def __init__(self, config_file):
+        self.nps = create_and_fill_dict_from_json(OUTPUT_FILENAME)
+        self.ids = create_and_fill_dict_from_json(IDS_OUTPUT_FILENAME)
+
         self.contact_admin_tag = {}
 
         self.user_states = {}
+        self.last_interaction_time = {}
 
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
@@ -749,14 +778,44 @@ class Bot:
         self.application = Application.builder().token(self.token).build()
 
         self.admin_ids = [int(admin_id) for admin_id in
-                          self.config.get('telegram', 'admin_ids').split(',')]  # Read admin IDs from config
+                          self.config.get('telegram', 'admin_ids').split(',')]
 
         self.application.add_handler(CommandHandler('start', self.start))
+        # self.application.add_handler(CommandHandler('getvalue', self.handle_get_value))
         self.application.add_handler(CallbackQueryHandler(self.handle_callback_query))
-        self.register_reply_handler()  # Register reply handler
+        self.register_reply_handler()
+
+    def is_spamming(self, user_id):
+        current_time = time.time()
+        if user_id in self.last_interaction_time:
+            if current_time - self.last_interaction_time[user_id] < 1:
+                return True
+        self.last_interaction_time[user_id] = current_time
+        return False
+
+    async def check_for_spam(self, update: Update):
+        user_id = update.effective_user.id
+        if self.is_spamming(user_id):
+            if update.message:
+                await update.message.reply_text(
+                    "You're sending messages too quickly. Please wait a moment before trying again.")
+            elif update.callback_query:
+                await update.callback_query.answer(
+                    "You're interacting too quickly. Please wait a moment before trying again.")
+            return True
+        return False
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if await self.check_for_spam(update):
+            return
+
         await self.transition_to(LanguageSelectionScene(self), update, context)
+
+    async def handle_get_value(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        key = update.message.text
+        print(key)
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text=f"{self.nps['name']}: {self.nps[self.ids[key]]}")
 
     async def transition_to(self, state: State, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
@@ -772,6 +831,9 @@ class Bot:
         await self.user_states[user_id]['current_state'].enter(update, context)
 
     async def handle_callback_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if await self.check_for_spam(update):
+            return
+
         query = update.callback_query
         data = query.data
         user = update.effective_user
@@ -818,6 +880,9 @@ class Bot:
         self.application.add_handler(reply_handler)
 
     async def handle_reply(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if await self.check_for_spam(update):
+            return
+
         chat_id = update.message.chat_id
 
         # ADMIN REPLY
@@ -836,8 +901,25 @@ class Bot:
         if update.message.reply_to_message and update.message.reply_to_message.from_user.id == context.bot.id:
             print("Reply is to the bot's message.")
             await self.send_question_to_admin_group(update, context)
+
+        elif update.message.text.startswith('pass123'):
+            new_url = update.message.text.split(' ', 1)[1]
+            config = configparser.ConfigParser()
+            config.read('config.ini')
+            if 'google_sheets' not in config:
+                config.add_section('google_sheets')
+            config.set('google_sheets', 'sheet_url', new_url)
+            with open('config.ini', 'w') as config_file:
+                config.write(config_file)
+
+            update_dicts()
+            self.nps = create_and_fill_dict_from_json(OUTPUT_FILENAME)
+            self.ids = create_and_fill_dict_from_json(IDS_OUTPUT_FILENAME)
+
         else:
             print("Reply is not to the bot's message. Ignoring.")
+            if len(update.message.text) == 6:
+                await self.handle_get_value(update, context)
 
     async def send_question_to_admin_group(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
@@ -902,8 +984,6 @@ class Bot:
     def run(self):
         self.application.run_polling()
 
-
-ADMIN_GROUP_ID = -4216776605
 
 if __name__ == "__main__":
     bot = Bot('config.ini')

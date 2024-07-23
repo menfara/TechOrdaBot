@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c2b489f5-d049-40a1-b6ca-e1c90a752332" name="Changes" comment="первый прототип TechOrdaBot">
-      <change afterPath="$PROJECT_DIR$/docs/договор_фонд_школа.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/инструкция.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/инструкция_для_школ.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/инструкция_к_шаблону_сертификата.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/инструкция_отчетности_для_школы_2024.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/памятка_по_ЭАВР_для_школы.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/счет_на_фин_оплату_для_школы.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/типовой_договор_школа_студент.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/форма_подтверждения_отчета_(для студентов).docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/шаблон_финального_отчета.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/doc1.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/translations.py" beforeDir="false" afterPath="$PROJECT_DIR$/translations.py" afterDir="false" />
-    </list>
+    <list default="true" id="c2b489f5-d049-40a1-b6ca-e1c90a752332" name="Changes" comment="v3" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,6 +43,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Python.google_sheets_reader.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;Python.translations.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
@@ -66,10 +52,33 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Farkhat\PycharmProjects\techordaBot" />
       <recent name="C:\Users\Farkhat\PycharmProjects\techordaBot\docs" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
+    <configuration name="google_sheets_reader" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="techordaBot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/google_sheets_reader.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="techordaBot" />
       <option name="ENV_FILES" value="" />
@@ -116,6 +125,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.google_sheets_reader" />
         <item itemvalue="Python.translations" />
       </list>
     </recent_temporary>
@@ -144,7 +154,23 @@
       <option name="project" value="LOCAL" />
       <updated>1721198010873</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="v2">
+      <option name="closed" value="true" />
+      <created>1721286247030</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1721286247030</updated>
+    </task>
+    <task id="LOCAL-00003" summary="v3">
+      <option name="closed" value="true" />
+      <created>1721713218776</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1721713218776</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -160,6 +186,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="первый прототип TechOrdaBot" />
-    <option name="LAST_COMMIT_MESSAGE" value="первый прототип TechOrdaBot" />
+    <MESSAGE value="v2" />
+    <MESSAGE value="v3" />
+    <option name="LAST_COMMIT_MESSAGE" value="v3" />
   </component>
 </project>
