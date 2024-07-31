@@ -51,8 +51,13 @@ class State:
         pass
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        # await self.handle_custom_callback(update, context)
-        pass
+        stack = self.bot.user_states[update.effective_user.id]['state_stack']
+        try:
+            if stack[-1] != "inner":
+                stack.append(self)
+                stack.append("inner")
+        except Exception:
+            pass
 
     async def handle_back(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.callback_query.message.reply_text("No previous state to go back to.")
@@ -156,7 +161,7 @@ class TeachingNotStartedScene(State):
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        await update.callback_query.message.reply_text(Translations.variant_promt[self.language],
+        await update.callback_query.message.reply_text(Translations.status_message[self.language],
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -204,6 +209,7 @@ class TNESchoolShowcaseScene(State):
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -245,6 +251,8 @@ class TNEStudentSelectionScene(State):
                                                        reply_markup=reply_markup, parse_mode="HTML")
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -288,6 +296,8 @@ class TNEStudentContractScene(State):
                                                        reply_markup=reply_markup, parse_mode="HTML")
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -325,6 +335,8 @@ class TNEFundSchoolScene(State):
                                                        reply_markup=reply_markup, parse_mode="HTML")
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -360,6 +372,8 @@ class TNEAdvancePaymentScene(State):
                                                        reply_markup=reply_markup, parse_mode="HTML")
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -399,6 +413,8 @@ class TeachingStartedScene(State):
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_status = query.data
@@ -438,6 +454,8 @@ class TSMonthlyReport(State):
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -475,7 +493,7 @@ class TSLearningChange(State):
         keyboard = []
 
         keyboard.append([InlineKeyboardButton(f"{Translations.notify_learning_change[self.language]}",
-                                              url="https://astanahub.com/account/service_request/98827/update/?tab=0")])
+                                              url="https://astanahub.com/account/service/techorda_request/request/168/create/")])
         keyboard.append([InlineKeyboardButton(f"{Translations.additional_agreements[self.language]}",
                                               callback_data=self.OPTION_2)])
         keyboard.append([InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data=self.OPTION_OTHER)])
@@ -486,6 +504,8 @@ class TSLearningChange(State):
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -565,6 +585,9 @@ class TFCompetenceAssessment(State):
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -619,6 +642,8 @@ class TFFinalReport(State):
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -668,6 +693,8 @@ class TFFinalPayment(State):
                                                        reply_markup=reply_markup)
 
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await super().handle_callback(update, context)
+
         query = update.callback_query
         await query.answer()
         selected_option = query.data
@@ -781,9 +808,13 @@ class Bot:
                           self.config.get('telegram', 'admin_ids').split(',')]
 
         self.application.add_handler(CommandHandler('start', self.start))
+        self.application.add_handler(CommandHandler('chat_id', self.chat_id))
         # self.application.add_handler(CommandHandler('getvalue', self.handle_get_value))
         self.application.add_handler(CallbackQueryHandler(self.handle_callback_query))
         self.register_reply_handler()
+
+    async def chat_id(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        print(update.effective_chat.id)
 
     def is_spamming(self, user_id):
         current_time = time.time()
@@ -861,8 +892,14 @@ class Bot:
         if user_id not in self.user_states:
             self.user_states[user_id] = {'state_stack': [], 'current_state': None}
 
-        if self.user_states[user_id]['state_stack']:
-            previous_state = self.user_states[user_id]['state_stack'].pop()
+        user_id_state_stack = self.user_states[user_id]['state_stack']
+        if user_id_state_stack:
+            previous_state = user_id_state_stack.pop()
+
+            if previous_state == "inner":
+                previous_state = user_id_state_stack.pop()
+                print(previous_state)
+            
             self.user_states[user_id]['current_state'] = previous_state
             await self.user_states[user_id]['current_state'].enter(update, context)
         else:
