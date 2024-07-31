@@ -627,7 +627,7 @@ class TFFinalReport(State):
     async def enter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [InlineKeyboardButton(f"{Translations.final_report_form[self.language]}",
-                                  url="https://astanahub.com/account/service_request/98834/update/?tab=0")],
+                                  url="https://astanahub.com/account/service/techorda_final_report/request/189/create/")],
 
             [InlineKeyboardButton(f"{Translations.final_report_template_button[self.language]}",
                                   callback_data=self.OPTION_1)],

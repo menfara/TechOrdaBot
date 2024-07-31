@@ -55,13 +55,13 @@ class Translations:
 
     nps = {
         "kz": "nps",
-        "ru": "nps",
+        "ru": "Проверить NPS",
         "en": "nps"
     }
 
     nps_message = {
         "kz": "type nps code",
-        "ru": "type nps code",
+        "ru": "Введите код NPS",
         "en": "type nps code"
     }
 
