@@ -146,6 +146,7 @@ class TeachingNotStartedScene(State):
         'student_selection_process',
         'student_contracts',
         'signing_contract_fund_school',
+        'sign_kik',
         'advance_payment',
     ]
 
@@ -182,7 +183,16 @@ class TeachingNotStartedScene(State):
         if selected_option == self.options[3]:
             await self.bot.transition_to(TNEFundSchoolScene(self.bot, self.language), update, context)
         if selected_option == self.options[4]:
+            keyboard = [[InlineKeyboardButton(f"{Translations.other[self.language]}", callback_data='other')]]
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            with open('docs/договор_кик_школа.docx', 'rb') as document:
+                await context.bot.send_document(chat_id=query.message.chat_id, document=document,
+                                                reply_markup=reply_markup)
+
+        if selected_option == self.options[5]:
             await self.bot.transition_to(TNEAdvancePaymentScene(self.bot, self.language), update, context)
+        await self.bot.suggest_return_to_client_status(update, context)
 
 
 # Витрина IT школ

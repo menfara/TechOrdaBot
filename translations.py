@@ -207,6 +207,12 @@ class Translations:
         "en": "Signing contract with the school fund"
     }
 
+    sign_kik = {
+        "kz": "Шартқа қол қою Школа- КИК",
+        "ru": "Подписание договора Школа- КИК",
+        "en": "Signing contract with the school fund"
+    }
+
     advance_payment = {
         "kz": "Аванстық төлем",
         "ru": "Авансовый платеж",
